@@ -15,120 +15,10 @@
 import Cell from "../lib/cell.js";
 import fs from "node:fs";
 import path from "node:path";
-import findModules from "../lib/findModules.js";
+import modulesPath from "../lib/modulesPath.js";
 
 var pdfPath;
 var doc;
-
-var newlines = false; // include newlines in cell's text
-
-class _Cell {
-
-  constructor() {
-    this.text = "";
-    // cell lower-left
-    this.x1;
-    this.y1;
-    // cell upper-right
-    this.x2;  // max(x + width, ...)
-    this.y2;  // baseline of top most string
-    // stats
-    this.count = 0;
-  }
-
-  addItem(item) {
-    if (item.width === 0)
-      return;
-    if (item.height === 0 && item.width > 2.8)
-      return;
-
-    // check cell bounding box
-    // item_y is the text baseline
-    let item_x = item.transform[ 4 ];
-    let item_y = item.transform[ 5 ];
-
-    if (!this.x1) {
-      this.x1 = item_x;
-      this.y1 = item_y;
-      this.x2 = item_x + item.width;
-      this.y2 = item_y + item.height;
-    }
-    else {
-      if (item_x < this.x1)
-        this.x1 = item_x;
-      if (item_y < this.y1)
-        this.y1 = item_y;
-      if (item_x + item.width > this.x2)
-        this.x2 = item_x + item.width;
-      if (item_y + item.height > this.y2)
-        this.y2 = item_y + item.height;
-    }
-
-    // append text to cell
-    this.text += item.str;
-    if (item.hasEOL)
-      this.text += newlines ? "\n" : " ";
-
-    this.count++;
-  }
-
-  // check alignment of item relative to cell
-  alignment(item) {
-    let aligns = {
-      top: false,
-      bottom: false,
-      left: false,
-      right: false,
-      adjacent: false
-    }
-
-    if (this.count === 0)
-      return aligns;
-
-    let item_x = item.transform[ 4 ];
-    let item_y = item.transform[ 5 ];
-
-    // horizontal alignment baseline
-    if (Math.abs(item_y - this.y1) < 2.0)
-      aligns.bottom = true;
-    // horizontal alignment topline
-    if (Math.abs(item_y + item.height - this.y2) < 2.0)
-      aligns.top = true;
-    // vertical alignment left justified
-    if (Math.abs(item_x - this.x1) < 2.0)
-      aligns.left = true;
-    // vertical alignment right justified
-    if (Math.abs(item_x + item.width - this.x2) < 2.0)
-      aligns.right = true;
-
-    // assume we're processing top to bottom, left to right
-
-    // adjacent horizontal, within approximately one space
-    if ((aligns.top || aligns.bottom) && Math.abs(item_x - this.x2) < 3.0)
-      aligns.adjacent = true;
-    // adjacent vertical, within approximately one line space
-    if ((aligns.left || aligns.right) && Math.abs((item_y + item.height) - this.y1) < 3.0)
-      aligns.adjacent = true;
-
-    return aligns;
-  }
-
-}
-
-function adjacent(x, y, prevItem, cell) {
-  let prevX = prevItem.transform[ 4 ];
-  let prevY = prevItem.transform[ 5 ];
-
-  // check if on some line as prevItem and within approximately two characters
-  if (Math.abs(prevY - y) < 8 && (x < (prevX + prevItem.width + 24)))
-    return true;
-
-  // check if next line
-  if ((prevY - y) > 8 && Math.abs(cell.x1 - x) < 10)
-    return true;
-
-  return false;
-}
 
 async function getContent() {
   try {
@@ -137,7 +27,7 @@ async function getContent() {
     var loadingTask = getDocument({
       url: pdfPath,
       fontExtraProperties: true,
-      standardFontDataUrl: path.join(await findModules(), "./pdfjs-dist/standard_fonts/")
+      standardFontDataUrl: await modulesPath("./pdfjs-dist/standard_fonts/")
     });
     doc = await loadingTask.promise;
     console.log("# Document Loaded");
@@ -157,7 +47,7 @@ async function getContent() {
 
     if (metadata) {
       console.log("## Metadata");
-      output.metadata = metadata.getAll()
+      output.metadata = metadata.get("dc:format");
       console.log(JSON.stringify(output.metadata, null, 2));
       console.log();
     }
@@ -202,8 +92,6 @@ async function parseMarkedPage(pageNum) {
   let span = false;
   let prevItem;
 
-  let newlines = false; // include newlines in cells
-
   for (let item of content.items) {
     if (item.type === "beginMarkedContent") {
       console.log(item.type + " " + item.tag);
@@ -247,7 +135,7 @@ async function parseMarkedPage(pageNum) {
 
       // determine if cell should be added to row
       // when new paragraph or span isn't adjacent to previous text
-      if (paragraph || (span && !adjacent(x, y, prevItem, cell))) {
+      if (paragraph || (span && !cell.isAdjacent(item))) {
         if (cell.count) {
           let text = cell.text.trimStart();
           row.push(text);

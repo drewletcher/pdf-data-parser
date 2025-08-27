@@ -12,7 +12,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import findModules from "../lib/findModules.js";
+import modulesPath from "../lib/modulesPath.js";
 
 var doc;
 
@@ -23,7 +23,7 @@ async function getContent(options) {
     let loadingTask = getDocument({
       url: options.url,
       fontExtraProperties: true,
-      standardFontDataUrl: path.join(await findModules(), "./pdfjs-dist/standard_fonts/")
+      standardFontDataUrl: await modulesPath("./pdfjs-dist/standard_fonts/")
     });
     doc = await loadingTask.promise;
 
@@ -44,7 +44,7 @@ async function getContent(options) {
 
     if (docdata.metadata) {
       console.log("## Metadata");
-      output.metadata = docdata.metadata.getAll()
+      output.metadata = docdata.metadata.get("dc:format");
       console.log(JSON.stringify(output.metadata, null, 2));
       console.log();
     }
@@ -57,7 +57,6 @@ async function getContent(options) {
     console.log("output: " + outputFile);
     fs.mkdirSync(path.dirname(outputFile), { recursive: true });
     fs.writeFileSync(outputFile, JSON.stringify(output, null, 2));
-
 
     for (let n = 1; n <= numPages; n++) {
       await loadPage(n, options);

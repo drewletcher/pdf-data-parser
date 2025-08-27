@@ -1,6 +1,6 @@
-import findModules from "../lib/findModules.js";
+import modulesPath from "../lib/modulesPath.js";
 
 (async () => {
-  console.log(await findModules());
+  console.log(await modulesPath("./pdfjs-dist/standard_fonts/"));
 }
 )();

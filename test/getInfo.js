@@ -30,7 +30,7 @@ loadingTask.promise
       console.log();
       if (data.metadata) {
         console.log("## Metadata");
-        console.log(JSON.stringify(data.metadata.getAll(), null, 2));
+        console.log(JSON.stringify(data.metadata.get("dc:format"), null, 2));
         console.log();
       }
     });
