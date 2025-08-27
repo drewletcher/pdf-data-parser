@@ -1,5 +1,5 @@
 /**
- * test/testRepeatCell.js
+ * test/repeatCell.test.js
  */
 
 import { PdfDataReader, RowAsObjectTransform, RepeatCellTransform } from "../lib/index.js";

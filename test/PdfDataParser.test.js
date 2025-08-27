@@ -1,5 +1,5 @@
 /**
- * test/testParser.js
+ * test/PdfDataParser.test.js
  */
 
 import PdfDataParser from "../lib/PdfDataParser.js";
@@ -37,14 +37,16 @@ async function test(options) {
 (async () => {
 
   if (await test({ url: "./test/data/pdf/helloworld.pdf" })) return 1;
-  if (await test({ url: "http://dev.oby4.org/data/US/census.gov/reference/ClassCodes.pdf", newlines: true })) return 1;
+  if (await test({ url: "http://dev.oby4.org/data/US/FED/census.gov/reference/ClassCodes.pdf", newlines: true })) return 1;
   if (await test({ url: "./test/data/pdf/Nat_State_Topic_File_formats.pdf", heading: "Government Units File Format", cells: 3, orderXY: false })) return 1;
-  if (await test({ url: "./test/data/pdf/CoJul22.pdf", repeatingHeaders: true })) return 1;
-  if (await test({ url: "./test/data/pdf/CongJul22.pdf" })) return 1;
+  if (await test({ url: "./test/data/pdf/CoJul22.pdf", repeatingHeaders: true, missingValues: true })) return 1;
+  if (await test({ url: "./test/data/pdf/CongJul22.pdf", missingValues: true })) return 1;
   if (await test({ url: "./test/data/pdf/state_voter_registration_jan2024.pdf", pages: [ 3, 4, 5 ], pageHeader: 64, repeatingHeaders: true })) return 1;
 
   if (await test({ data: "./test/data/pdf/helloworld.pdf" })) return 1;
   if (await test({ data: "./test/data/pdf/ClassCodes.pdf", newlines: true })) return 1;
   if (await test({ data: "./test/data/pdf/2023-Registered-Voter-Count.pdf", pageHeader: 124, cells: "3-3" })) return 1;
+
+  if (await test({ url: "/var/data/US/FED/fec.gov/resources/cms-content/documents/2024presgeresults.pdf", pages: [ 1 ], pageHeader: 80, cells: 3, missingValues: true })) return 1;
 
 })();

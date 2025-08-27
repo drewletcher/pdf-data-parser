@@ -1,5 +1,5 @@
 /**
- * test/testReader.js
+ * test/PdfDataReader.test.js
  */
 
 import PdfDataReader from "../lib/PdfDataReader.js";
@@ -42,7 +42,7 @@ async function test(options) {
 
 (async () => {
   if (await test({ url: "./test/data/pdf/helloworld.pdf" })) return 1;
-  if (await test({ url: "http://dev.oby4.org/data/US/census.gov/reference/ClassCodes.pdf", newlines: false })) return 1;
+  if (await test({ url: "http://dev.oby4.org/data/US/FED/census.gov/reference/ClassCodes.pdf", newlines: false })) return 1;
   if (await test({ url: "./test/data/pdf/Nat_State_Topic_File_formats.pdf", heading: /Official short names, .*/, stopHeading: /.* File Format/, orderXY: false })) return 1;
   if (await test({ url: "./test/data/pdf/CoJul22.pdf", repeatingHeaders: true })) return 1;
   if (await test({ url: "./test/data/pdf/CongJul22.pdf" })) return 1;
@@ -50,4 +50,7 @@ async function test(options) {
 
   if (await test({ data: "./test/data/pdf/helloworld.pdf" })) return 1;
   if (await test({ data: "./test/data/pdf/ClassCodes.pdf", newlines: true })) return 1;
+
+  if (await test({ url: "/var/data/US/FED/fec.gov/resources/cms-content/documents/2024presgeresults.pdf", pages: [ 1 ], pageHeader: 80, cells: 3, missingValues: true })) return 1;
+
 })();

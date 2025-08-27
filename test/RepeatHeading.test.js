@@ -1,5 +1,5 @@
 /**
- * test/testRepeatHeading.js
+ * test/repeatHeading.test.js
  */
 
 import { PdfDataReader, RowAsObjectTransform, RepeatHeadingTransform } from "../lib/index.js";
