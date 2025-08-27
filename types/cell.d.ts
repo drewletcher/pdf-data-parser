@@ -7,7 +7,6 @@ export default class Cell {
      * @param {*} options parser options
      */
     constructor(options?: any);
-    options: any;
     text: string;
     x1: number;
     y1: number;
@@ -21,6 +20,7 @@ export default class Cell {
     prevY: number;
     prevX2: number;
     prevY2: number;
+    newlines: any;
     hasSpan: boolean;
     inserted: boolean;
     get lineHeight(): number;
