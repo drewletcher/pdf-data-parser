@@ -68,6 +68,8 @@ The options file supports options for all pdf-data-parser modules. Parser will r
   "stopHeading": null,
   // cells - number of cells for a data row, minimum or "min-max", default = "1-256".
   "cells": "1-256",
+  // hasHeader - indicates if the table has a header row
+  "hasHeader": true,
   // repeating - table header row repeats on each PDF page, default = false.
   "repeatingHeaders": false,
   // pageHeader - height of page header area in points, default: 0. Content in this area will be excluded. When true any row matching the first row encountered will be excluded from output.
@@ -84,6 +86,8 @@ The options file supports options for all pdf-data-parser modules. Parser will r
   "orderXY": true,
   // trim whitespace from output values, false (0) = none, true (1) = both, 2 = starting only, 3 = trailing only, default: true.
   "trim": true,
+  // check for blank cells by comparing XY coordinates against table header cells.
+  "missingValues": false
 
   /* RowAsObjectTransform options */
 
@@ -183,11 +187,15 @@ Common Options:
 
 `{Number} cells` - Minimum number of cells in tabular data; optional, default: 1. If `heading` is not specified then all rows in document with at least `cells` length will be output. If `heading` string is found parser will look for the first row that contains at least `cells` count of cells after the heading. The parser will output rows until it encounters a row with less than `cells` count of cells.
 
+`{Boolean} hasHeader` - indicates if the table has a header row, default: true
+
 `{Boolean} repeatingHeaders` - Indicates if table headers are repeated on each page, default: false. The table headers will be compare to the first row on each subsequent page.  If found they will be removed from the output.
 
 `{Number} pageHeader` - Height of page header area in points, default: 0. Content within this area of the page will not be included in output. Use about 16 points per line including blank lines.
 
 `{Number} pageFooter` - Height of page footer area in points, default: 0. Content within this area of the page will not be included in output. Use about 16 points per line including blank lines.
+
+`{Boolean} missingValues` - check for blank cells by comparing XY coordinates against table header cells, default: false.
 
 Other Options:
 
@@ -479,13 +487,32 @@ house3 = await parser.parse();
 
 The /test/data/pdf fold contains a PDF that was created by a report generator, state_voter_registration_jan2024.pdf.  This PDF content does not contain Marked content and cell positioning is totally by X,Y coordinates.  Also, it contains subheadings in tables and some missing cell values.  The test files optionsRepeatCells.json | testRepeatCells.js and optionsRepeatHeading | testRepeatHeading.js contain examples of parsing this type of PDF document.
 
+### Missing Values for Blank Cells
+
+Tables in PDF documents may look like HTML tables or spreadsheets, but most layout is done using X,Y coordinates not by markup elements. To identify blank cells in a table PdfDataParser compares the X,Y coordinates of the cell to X,Y coordinates of header row cells.
+
+[2024presgeresults.pdf](./test/data/pdf/2024presgeresults.pdf) contains multiple tables. The first page contains a table with Electoral College results with blank cells instead of 0's. This document contains page headers and footers on each page. Use the _missingValues_ option to output null for missing values.
+
+```javascript
+let parser = new PdfDataParser({ url: "/var/data/US/FED/fec.gov/resources/cms-content/documents/2024presgeresults.pdf", pages: [ 1 ], pageHeader: 80, cells: 3, missingValues: true })
+```
+
+```json
+[
+  [ "STATE", "ELECTORAL VOTES", "ELECTORAL VOTES CAST FOR DONALD J. TRUMP (R)", "ELECTORAL VOTES CAST FOR KAMALA D. HARRIS (D)"  ],
+  [ "AL", "9", "9", null ],
+  [ "AZ", "11", "11", null ],
+  [ "CA", "54", null, "54" ],
+  ...
+```
+
 ## Notes
 
 ---
 
 * Only supports PDF files containing grid/table like layouts. Does not support reading PDF forms (XFA).
 * Tables that span multiple pages are supported as long as all cell text for an individual row is on the same page.
-* Cells crossing page boundaries is not supported, currently. The cell will be split into multiple rows. The second row may not contain the proper number of cells, i.e. missing values are not supported, currently.
+* Cells crossing page boundaries is not supported, currently. The cell will be split into multiple rows. The second row may not contain the proper number of cells.
 * Embedded hyperlinks are not supported. The link information is not provided by pdf.js API.
 * Does not support identification of titles, headings, column headers, etc. by using style information for a cell. This style information is not provided by pdf.js API.
-* Vertical spanning cells are parsed with first row where the cell is encountered. Subsequent rows will not contain the cell and have one less cell. Currently, vertical spanning cells must be at the end of the row otherwise the ordinal position of cells in the following rows will be incorrect, i.e. missing values are not supported.
+* Vertical spanning cells are parsed with first row where the cell is encountered. Subsequent rows will not contain the cell and have one less cell.

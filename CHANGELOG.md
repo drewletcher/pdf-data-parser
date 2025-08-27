@@ -1,5 +1,9 @@
 # pdf-data-parser Change Log
 
+- version 1.2.20
+  - enhancement: option.missingValues - check for blank cells by comparing XY coordinates against table header cells, default: false
+  - enhancement: options.hasHeader - indicates if the table has a header row, default: true
+  - updated:     dependency "pdfjs-dist": "^5.4.54"
 - version 1.2.19
   - refactor: convert project to ECMAScript modules
   - refactor: options hasHeader default is false
@@ -45,7 +49,7 @@
 - version 1.2.6
   - updated: README.md
 - version 1.2.5
-  - feature: findModules() finds node_modules dir for default fonts
+  - feature: modulesPath() finds node_modules dir for default fonts
   - updated: README.md cli options
 - version 1.2.4
   - feature: implement CLI program, pdp or pdf-data-parser
