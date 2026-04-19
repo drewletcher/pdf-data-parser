@@ -22,7 +22,10 @@
     "pdp": "pdf-data-parser.js",
     "pdfdataparser": "pdf-data-parser.js"
   },
-  "repository": "git@github.com/drewletcher/pdf-data-parser.git",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/drewletcher/pdf-data-parser.git"
+  },
   "homepage": "https://github.com/drewletcher/pdf-data-parser#readme",
   "bugs": "https://github.com/drewletcher/pdf-data-parser/issues",
   "dependencies": {
