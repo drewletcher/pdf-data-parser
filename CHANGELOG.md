@@ -1,5 +1,8 @@
 # pdf-data-parser Change Log
 
+- version 1.2.21
+  - updated:  dependency "pdfjs-dist": "^5.6.205"
+  - bug fix:  fix parser started state
 - version 1.2.20
   - enhancement: option.missingValues - check for blank cells by comparing XY coordinates against table header cells, default: false
   - enhancement: options.hasHeader - indicates if the table has a header row, default: true
