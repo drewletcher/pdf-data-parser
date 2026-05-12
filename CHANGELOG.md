@@ -1,5 +1,8 @@
 # pdf-data-parser Change Log
 
+- version 1.2.22
+  - documentation: updated README.md
+  - updated:  dependency "pdfjs-dist": "^5.7.284"
 - version 1.2.21
   - updated:  dependency "pdfjs-dist": "^5.6.205"
   - bug fix:  fix parser started state
@@ -58,6 +61,7 @@
   - feature: implement CLI program, pdp or pdf-data-parser
   - refactor: if options.heading is not defined process entire document, not just first table.
   - updated: pdfjs-dist@4.0
+
 - version 1.1.3
   - use latest pre-built PDF.js from npm package 'pdf.js-dist' instead of building it
 - version 1.1.2
@@ -75,6 +79,7 @@
   - improved handling of font size and line spacing
   - improved handling of cells with _Span_ marked content
   - testing: compare output files to expected data
+
 - version 1.0.5
   - add comment about vertical spanning cells to README
 - version 1.0.4
@@ -89,6 +94,7 @@
 - version 1.0.0
   - complete README file
   - testing updates
+
 - version 0.9.1
   - cleanup code, comments and readme
 - version 0.9.0
